@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RUSM Campus Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1B3A5C;--blue:#2E75B6;--teal:#66C6C1;--mTeal:#9EDDD1;--lTeal:#CAEADF;--yel:#FFE885;--lYel:#FFF4C7;--gold:#FEB522;--peri:#98ACE5;--lBl:#B6CDEF;--coral:#F28D79;--pink:#EFB1D0;--gray:#C2C3C8;--dk:#404040;--bg:#F7F6F3;--card:#FFF;--bdr:#E2DED8;--mut:#888780;--cyan:#96EBF6;--r:10px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dk);padding:1.2rem}
+.w{max-width:1200px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;flex-wrap:wrap;gap:6px}
+.hd h1{font-size:1.3rem;font-weight:700;color:var(--navy)}
+.hd-r{display:flex;gap:5px}
+.b{padding:5px 12px;border-radius:16px;border:none;font-size:.7rem;font-weight:600;cursor:pointer;font-family:inherit}
+.bn{background:var(--navy);color:#fff}.bn:hover{background:#2a5a8c}
+.bo{background:#fff;color:var(--navy);border:1.5px solid var(--bdr)}
+/* Tabs */
+.st{display:flex;gap:.3rem;margin-bottom:.5rem}
+.sb{padding:.3rem .8rem;border-radius:16px;border:1.5px solid var(--bdr);background:#fff;font-size:.7rem;cursor:pointer;color:var(--mut);font-weight:500;font-family:inherit}
+.sb.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tabs{display:flex;gap:.3rem;margin-bottom:.7rem;flex-wrap:wrap}
+.tab{padding:.35rem .8rem;border-radius:20px;border:1.5px solid var(--bdr);background:#fff;font-size:.72rem;cursor:pointer;color:var(--mut);font-weight:500;font-family:inherit}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab:hover:not(.on){background:#eee}
+/* Metrics */
+.ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:.4rem;margin-bottom:.7rem}
+.m{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:.4rem .5rem;text-align:center}
+.mv{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:600;color:var(--navy)}
+.ml{font-size:.58rem;color:var(--mut)}
+/* Layout */
+.ly{display:grid;grid-template-columns:120px 1fr;gap:1rem;align-items:start}
+.bw{position:sticky;top:.7rem}
+.blb{font-size:.58rem;font-family:'DM Mono',monospace;color:var(--mut);text-align:center;margin-bottom:.2rem;text-transform:uppercase}
+.bbx{width:100%;height:440px;position:relative;border-radius:var(--r);border:1.5px solid var(--bdr);background:#fff}
+.bsk{position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column-reverse}
+.bs{width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bs span{font-size:.52rem;font-weight:600;text-align:center;line-height:1.1;padding:1px 2px;pointer-events:none;color:rgba(44,44,42,.85)}
+.btg{position:absolute;left:-6px;right:-6px;border-top:2.5px dashed var(--navy);pointer-events:none}
+.btl{position:absolute;left:-6px;transform:translateX(-100%);font-size:.55rem;font-family:'DM Mono',monospace;color:var(--navy);font-weight:600;white-space:nowrap;top:-8px;padding-right:3px}
+.bsub{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--mut);text-align:center;margin-top:.25rem}
+.bgsf{font-size:.68rem;font-family:'DM Mono',monospace;color:var(--navy);text-align:center;font-weight:500}
+.bntg{font-size:.55rem;font-family:'DM Mono',monospace;color:var(--blue);text-align:center}
+/* Table */
+.pt{width:100%;border-collapse:collapse;font-size:.68rem;background:#fff;border-radius:var(--r);overflow:hidden}
+.pt th{background:var(--navy);color:#fff;padding:5px 6px;font-weight:600;text-align:right;font-size:.63rem;white-space:nowrap}
+.pt th:nth-child(1),.pt th:nth-child(2){text-align:left}
+.pt td{padding:4px 6px;border-bottom:1px solid var(--bdr);text-align:right;font-family:'DM Mono',monospace;font-size:.65rem}
+.pt td:nth-child(1),.pt td:nth-child(2){text-align:left;font-family:'DM Sans',sans-serif}
+.pt tr.c{cursor:pointer}.pt tr.c:hover{filter:brightness(.95)}
+.pt tr.c td{font-weight:700;font-size:.7rem;border-bottom:2px solid rgba(0,0,0,.1)}
+.pt tr.r td{font-size:.63rem;color:#555}
+.pt tr.r.h{display:none}
+.pt tr.t td{font-weight:700;background:#1B3A5C;color:#fff;font-size:.7rem}
+.pt input[type=number]{width:46px;border:1px solid var(--bdr);border-radius:3px;padding:2px;font-family:'DM Mono',monospace;font-size:.63rem;text-align:right;color:var(--navy)}
+.pt input:focus{outline:2px solid var(--blue)}
+.pt .d{background:none;border:none;color:var(--coral);cursor:pointer;font-size:.63rem;padding:0 2px}
+.ex{display:inline-block;width:0;height:0;border-style:solid;vertical-align:middle}
+.ex-r{border-width:4px 0 4px 7px;border-color:transparent transparent transparent var(--navy)}
+.ex-d{border-width:7px 4px 0 4px;border-color:var(--navy) transparent transparent transparent}
+.af{display:flex;gap:4px;align-items:center;margin-top:4px;padding:4px;background:var(--bg);border-radius:5px;font-size:.65rem;flex-wrap:wrap}
+.af input,.af select{border:1px solid var(--bdr);border-radius:3px;padding:2px 3px;font-family:'DM Mono',monospace;font-size:.63rem}
+.af select{font-family:'DM Sans',sans-serif}
+/* Charts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.cx{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:10px}
+.ct{font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:6px}
+.cs{font-size:.58rem;color:var(--mut);margin-top:3px}
+/* Cost table */
+.kt{width:100%;border-collapse:collapse;font-size:.68rem;background:#fff;border-radius:var(--r);overflow:hidden;margin-top:8px}
+.kt th{background:var(--navy);color:#fff;padding:5px 6px;font-weight:600;text-align:right}
+.kt th:first-child{text-align:left}
+.kt td{padding:5px 6px;border-bottom:1px solid var(--bdr);text-align:right;font-family:'DM Mono',monospace}
+.kt td:first-child{text-align:left;font-family:'DM Sans',sans-serif;font-weight:500}
+.kt tr:nth-child(even){background:var(--bg)}
+.kt tr.a td{color:var(--navy);font-weight:700;background:#1B3A5C10}
+/* Scale */
+.sc{display:flex;gap:5px;align-items:center;font-size:.68rem;margin-bottom:6px}
+.sc select{border:1px solid var(--bdr);border-radius:3px;padding:2px;font-size:.68rem}
+.pb{overflow:auto;max-height:550px;border:1px solid var(--bdr);border-radius:var(--r);background:#fff}
+@media print{body{padding:0;background:#fff}.hd-r,.tabs,.st,.af,.sc,.b{display:none!important}.bw{position:static!important}.ly{display:block!important}.pb{max-height:none!important;overflow:visible!important}svg,table{page-break-inside:avoid}}
+footer{margin-top:1rem;font-size:.58rem;color:var(--mut);font-family:'DM Mono',monospace}
+</style></head><body>
+<div class="w">
+<div class="hd"><h1>RUSM Campus Dashboard</h1><div class="hd-r">
+<button class="b bo" onclick="window.print()">Print / PDF</button>
+<button class="b bn" id="sv" onclick="doSave()">Export JSON</button></div></div>
+<div class="st" id="st"></div>
+<div class="tabs" id="tabs"></div>
+<div class="ms" id="ms"></div>
+<div id="ct"></div>
+<footer id="ft"></footer>
+</div>
+<script>
+var BMETA={"academic":{"grossing":1.65,"target":217500,"label":"Academic Building","unit":"NASF"},"clinic":{"grossing":2.05,"target":15000,"label":"Outpatient Clinic","unit":"NASF"},"residence":{"grossing":1.5,"target":78000,"label":"Student Residence","unit":"NASF"},"townhomes":{"grossing":1.0,"target":102300,"label":"Faculty Townhomes","unit":"GSF"}};
+var SCENARIOS=[{"label":"Scenario A","rooms":{"academic":[["1.0","Modular Lecture & TBL","#CAEADF",[[1,"Room A1",1,3850,175,56,80,850],[2,"Room A2 Swing",1,3850,175,56,84,850],[3,"Room A3",1,3850,175,56,80,850],[4,"Room BC1",1,3850,175,44,72,850],[5,"Room BC2 Swing",1,3850,175,36,68,850],[6,"Room BC3",1,3850,175,36,68,850],[7,"AV Control",3,200,0,40,70,1000],[8,"Lecturer Prep",4,150,0,30,55,575]]],["2.0","Small Group & PBL","#FFE885",[[9,"PBL Rooms",30,250,12,43,64,675],[10,"Seminar Rooms",6,550,24,44,70,625],[11,"Flexible Classroom",3,1800,60,30,80,675]]],["3.0","Digital Anatomy & Labs","#9EDDD1",[[12,"Digital Anatomy Lab",1,3500,82,50,70,975],[13,"Histology + Science",1,3600,40,44,64,800],[14,"Anatomy Studio",1,1500,0,35,55,700]]],["4.0","Clinical Skills & Sim","#EFB1D0",[[15,"Skills Labs",4,1600,24,44,80,875],[16,"Sim Suites",4,400,1,30,60,1150],[17,"Sim Control",4,150,0,30,60,1100],[18,"Debrief Rooms",12,300,12,26,46,650],[19,"SP Exam Rooms",30,120,1,16,80,900],[20,"SP Control",1,1500,0,16,80,950],[21,"SP Lounge",1,700,0,20,40,550],[22,"Sim Storage",1,2000,0,10,20,450]]],["5.0","Community","#CAEADF",[[23,"Data/Viz Studio",1,1200,0,25,50,750]]],["6.0","Student Learning","#FFE885",[[24,"Student Commons",1,7300,0,79,93,550],[25,"Quiet Study",1,11000,0,71,89,500],[26,"Lockers/Wellness",1,3580,0,60,85,400],[27,"Student Org Suite",1,600,0,30,55,500],[28,"Testing Lab",1,2800,80,36,90,700]]],["7.0","Faculty Offices","#B6CDEF",[[29,"Private Offices",70,120,1,45,65,600],[30,"Chair Offices",8,180,1,40,60,650],[31,"Open Workstations",12,64,1,35,55,550],[32,"Conf Room (12)",4,400,12,40,65,625],[33,"Conf Room (20)",1,600,20,40,65,625],[34,"Faculty Lounge",1,950,0,30,50,500],[35,"Mail/Copy",2,300,0,25,40,400]]],["8.0","Administration","#B6CDEF",[[36,"Dean's Suite",1,1100,0,45,60,650],[37,"Med Ed Office",1,900,0,45,60,600],[38,"Student Affairs",1,700,0,40,55,600],[39,"Registrar",1,400,0,35,50,550],[40,"Admin Workstations",8,64,1,40,60,500],[41,"Meeting Rooms",3,120,4,25,45,500],[42,"Board Room",1,650,20,20,50,750]]],["9.0","IT & AV","#C2C3C8",[[43,"Server/MDF",1,700,0,95,95,950],[44,"IDF Closets",5,100,0,95,95,600],[45,"AV Studio",1,800,0,30,55,900],[46,"IT Help Desk",1,500,0,40,60,600],[47,"IT Offices",5,120,1,40,60,550]]],["10.0","Building Support","#C2C3C8",[[48,"Entry/Reception",1,500,0,70,90,600],[49,"Restrooms",1,3800,0,50,80,550],[50,"MEP Rooms",1,4500,0,95,95,400],[51,"Security",1,400,0,40,60,400],[52,"Custodial",7,80,0,30,50,350],[53,"Loading/Receiving",1,1000,0,20,40,350],[54,"Storage",6,500,0,20,40,350],[55,"Lactation",2,100,0,15,30,400],[56,"First Aid",1,200,0,10,30,500]]]],"clinic":[["C1","Exam & Consultation","#96EBF6",[[1,"General Exam",14,120,1,45,75,750],[2,"Consultation",1,150,2,35,60,700],[3,"Triage Bays",2,80,1,50,80,600]]],["C2","Diagnostics","#B6CDEF",[[4,"POC Lab",1,300,0,40,65,850],[5,"Basic Imaging",1,400,0,30,55,950],[6,"Specimen Collection",1,120,1,35,60,700],[7,"Pharmacy",1,270,0,40,60,800]]],["C3","Urgent Care","#52D1ED",[[8,"UC Entry/Triage",1,200,0,50,80,650],[9,"Exam Bays",4,120,1,40,70,750],[10,"Procedure Bay",1,250,1,30,55,850]]],["C4","Patient Support","#FFF4C7",[[11,"Indoor Waiting",1,600,0,70,90,550],[12,"Outdoor Waiting",1,400,0,60,85,350],[13,"Health Ed Alcove",1,200,0,25,45,500],[14,"Patient WC",1,270,0,50,80,550]]],["C5","Med Education","#9EDDD1",[[15,"Student Workroom",1,350,8,43,65,600],[16,"Preceptor Offices",2,120,1,40,60,600],[17,"Student Lockers",1,110,0,60,85,400]]],["C6","Staff & Ops","#98ACE5",[[18,"Provider Offices",3,120,1,45,65,600],[19,"Clinic Manager",1,120,1,40,60,600],[20,"Staff Break",1,200,0,55,75,450]]],["C7","Building Support","#C2C3C8",[[21,"IT Closet",1,80,0,95,95,800],[22,"Custodial",1,80,0,30,50,350],[23,"Storage/Supply",1,200,0,25,40,350],[24,"Staff WC",1,170,0,50,80,550]]]],"residence":[["R1","Single Rooms","#FFCDAE",[[1,"Single Student",70,220,1,85,95,480]]],["R2","Double Rooms","#FFAF7D",[[2,"Double Student",40,340,2,85,95,450]]],["R3","Amenities","#F28D79",[[3,"Rooftop/Pool",1,3500,0,40,70,350],[4,"Kitchen/Dining",1,2500,0,65,85,550],[5,"Fitness",1,2800,0,50,80,500],[6,"Multi-Purpose",1,2400,0,30,60,450],[7,"Group Study",6,280,6,55,80,500],[8,"Quiet Lounge",1,440,0,65,85,450]]],["R4","Floor Common","#FFE885",[[9,"Floor Lounge",6,500,0,55,75,400],[10,"Floor Study",6,250,4,50,75,450],[11,"Laundry",3,200,0,40,60,350]]],["R5","Admin & Ops","#FF6A4F",[[12,"RA Apartments",2,350,1,90,95,450],[13,"Mgmt Office",1,200,1,40,60,550],[14,"Reception/Mail",1,200,0,50,70,500]]],["R6","Building Support","#C2C3C8",[[15,"Lobby",1,600,0,70,90,550],[16,"MEP/Gen/Cistern",1,1200,0,95,95,380],[17,"Storage/Maint",1,600,0,25,40,350],[18,"Trash/Recycle",1,250,0,20,35,300],[19,"Common WC",1,260,0,50,80,500]]]],"townhomes":[["T1","1-BR Units","#CAEADF",[[1,"1-BR Townhome",54,750,1,90,95,360]]],["T2","2-BR Units","#9EDDD1",[[2,"2-BR Townhome",16,1000,2,90,95,340]]],["T3","4-BR Units","#66C6C1",[[3,"4-BR Townhome",16,1250,4,90,95,320]]],["T4","Community","#FFE885",[[4,"Pool/Clubhouse",1,2500,0,40,65,400],[5,"Playground",1,1500,0,30,55,300],[6,"BBQ/Social",1,1200,0,25,50,250]]],["T5","Site Infra","#C2C3C8",[[7,"Roads/Parking",1,12000,0,0,0,180],[8,"Utilities",1,4000,0,0,0,250],[9,"Landscaping",1,6600,0,0,0,120]]]]}},{"label":"Scenario B","rooms":{"academic":[["1.0","Modular Lecture & TBL","#CAEADF",[[1,"Room A1",1,3850,175,56,80,850],[2,"Room A2 Swing",1,3850,175,56,84,850],[3,"Room A3",1,3850,175,56,80,850],[4,"Room BC1",1,3850,175,44,72,850],[5,"Room BC2 Swing",1,3850,175,36,68,850],[6,"Room BC3",1,3850,175,36,68,850],[7,"AV Control",3,200,0,40,70,1000],[8,"Lecturer Prep",4,150,0,30,55,575]]],["2.0","Small Group & PBL","#FFE885",[[9,"PBL Rooms",30,250,12,43,64,675],[10,"Seminar Rooms",6,550,24,44,70,625],[11,"Flexible Classroom",3,1800,60,30,80,675]]],["3.0","Digital Anatomy & Labs","#9EDDD1",[[12,"Digital Anatomy Lab",1,3500,82,50,70,975],[13,"Histology + Science",1,3600,40,44,64,800],[14,"Anatomy Studio",1,1500,0,35,55,700]]],["4.0","Clinical Skills & Sim","#EFB1D0",[[15,"Skills Labs",4,1600,24,44,80,875],[16,"Sim Suites",4,400,1,30,60,1150],[17,"Sim Control",4,150,0,30,60,1100],[18,"Debrief Rooms",12,300,12,26,46,650],[19,"SP Exam Rooms",30,120,1,16,80,900],[20,"SP Control",1,1500,0,16,80,950],[21,"SP Lounge",1,700,0,20,40,550],[22,"Sim Storage",1,2000,0,10,20,450]]],["5.0","Community","#CAEADF",[[23,"Data/Viz Studio",1,1200,0,25,50,750]]],["6.0","Student Learning","#FFE885",[[24,"Student Commons",1,7300,0,79,93,550],[25,"Quiet Study",1,11000,0,71,89,500],[26,"Lockers/Wellness",1,3580,0,60,85,400],[27,"Student Org Suite",1,600,0,30,55,500],[28,"Testing Lab",1,2800,80,36,90,700]]],["7.0","Faculty Offices","#B6CDEF",[[29,"Private Offices",70,120,1,45,65,600],[30,"Chair Offices",8,180,1,40,60,650],[31,"Open Workstations",12,64,1,35,55,550],[32,"Conf Room (12)",4,400,12,40,65,625],[33,"Conf Room (20)",1,600,20,40,65,625],[34,"Faculty Lounge",1,950,0,30,50,500],[35,"Mail/Copy",2,300,0,25,40,400]]],["8.0","Administration","#B6CDEF",[[36,"Dean's Suite",1,1100,0,45,60,650],[37,"Med Ed Office",1,900,0,45,60,600],[38,"Student Affairs",1,700,0,40,55,600],[39,"Registrar",1,400,0,35,50,550],[40,"Admin Workstations",8,64,1,40,60,500],[41,"Meeting Rooms",3,120,4,25,45,500],[42,"Board Room",1,650,20,20,50,750]]],["9.0","IT & AV","#C2C3C8",[[43,"Server/MDF",1,700,0,95,95,950],[44,"IDF Closets",5,100,0,95,95,600],[45,"AV Studio",1,800,0,30,55,900],[46,"IT Help Desk",1,500,0,40,60,600],[47,"IT Offices",5,120,1,40,60,550]]],["10.0","Building Support","#C2C3C8",[[48,"Entry/Reception",1,500,0,70,90,600],[49,"Restrooms",1,3800,0,50,80,550],[50,"MEP Rooms",1,4500,0,95,95,400],[51,"Security",1,400,0,40,60,400],[52,"Custodial",7,80,0,30,50,350],[53,"Loading/Receiving",1,1000,0,20,40,350],[54,"Storage",6,500,0,20,40,350],[55,"Lactation",2,100,0,15,30,400],[56,"First Aid",1,200,0,10,30,500]]]],"clinic":[["C1","Exam & Consultation","#96EBF6",[[1,"General Exam",14,120,1,45,75,750],[2,"Consultation",1,150,2,35,60,700],[3,"Triage Bays",2,80,1,50,80,600]]],["C2","Diagnostics","#B6CDEF",[[4,"POC Lab",1,300,0,40,65,850],[5,"Basic Imaging",1,400,0,30,55,950],[6,"Specimen Collection",1,120,1,35,60,700],[7,"Pharmacy",1,270,0,40,60,800]]],["C3","Urgent Care","#52D1ED",[[8,"UC Entry/Triage",1,200,0,50,80,650],[9,"Exam Bays",4,120,1,40,70,750],[10,"Procedure Bay",1,250,1,30,55,850]]],["C4","Patient Support","#FFF4C7",[[11,"Indoor Waiting",1,600,0,70,90,550],[12,"Outdoor Waiting",1,400,0,60,85,350],[13,"Health Ed Alcove",1,200,0,25,45,500],[14,"Patient WC",1,270,0,50,80,550]]],["C5","Med Education","#9EDDD1",[[15,"Student Workroom",1,350,8,43,65,600],[16,"Preceptor Offices",2,120,1,40,60,600],[17,"Student Lockers",1,110,0,60,85,400]]],["C6","Staff & Ops","#98ACE5",[[18,"Provider Offices",3,120,1,45,65,600],[19,"Clinic Manager",1,120,1,40,60,600],[20,"Staff Break",1,200,0,55,75,450]]],["C7","Building Support","#C2C3C8",[[21,"IT Closet",1,80,0,95,95,800],[22,"Custodial",1,80,0,30,50,350],[23,"Storage/Supply",1,200,0,25,40,350],[24,"Staff WC",1,170,0,50,80,550]]]],"residence":[["R1","Single Rooms","#FFCDAE",[[1,"Single Student",70,220,1,85,95,480]]],["R2","Double Rooms","#FFAF7D",[[2,"Double Student",40,340,2,85,95,450]]],["R3","Amenities","#F28D79",[[3,"Rooftop/Pool",1,3500,0,40,70,350],[4,"Kitchen/Dining",1,2500,0,65,85,550],[5,"Fitness",1,2800,0,50,80,500],[6,"Multi-Purpose",1,2400,0,30,60,450],[7,"Group Study",6,280,6,55,80,500],[8,"Quiet Lounge",1,440,0,65,85,450]]],["R4","Floor Common","#FFE885",[[9,"Floor Lounge",6,500,0,55,75,400],[10,"Floor Study",6,250,4,50,75,450],[11,"Laundry",3,200,0,40,60,350]]],["R5","Admin & Ops","#FF6A4F",[[12,"RA Apartments",2,350,1,90,95,450],[13,"Mgmt Office",1,200,1,40,60,550],[14,"Reception/Mail",1,200,0,50,70,500]]],["R6","Building Support","#C2C3C8",[[15,"Lobby",1,600,0,70,90,550],[16,"MEP/Gen/Cistern",1,1200,0,95,95,380],[17,"Storage/Maint",1,600,0,25,40,350],[18,"Trash/Recycle",1,250,0,20,35,300],[19,"Common WC",1,260,0,50,80,500]]]],"townhomes":[["T1","1-BR Units","#CAEADF",[[1,"1-BR Townhome",54,750,1,90,95,360]]],["T2","2-BR Units","#9EDDD1",[[2,"2-BR Townhome",16,1000,2,90,95,340]]],["T3","4-BR Units","#66C6C1",[[3,"4-BR Townhome",16,1250,4,90,95,320]]],["T4","Community","#FFE885",[[4,"Pool/Clubhouse",1,2500,0,40,65,400],[5,"Playground",1,1500,0,30,55,300],[6,"BBQ/Social",1,1200,0,25,50,250]]],["T5","Site Infra","#C2C3C8",[[7,"Roads/Parking",1,12000,0,0,0,180],[8,"Utilities",1,4000,0,0,0,250],[9,"Landscaping",1,6600,0,0,0,120]]]]}},{"label":"Scenario C","rooms":{"academic":[["1.0","Modular Lecture & TBL","#CAEADF",[[1,"Room A1",1,3850,175,56,80,850],[2,"Room A2 Swing",1,3850,175,56,84,850],[3,"Room A3",1,3850,175,56,80,850],[4,"Room BC1",1,3850,175,44,72,850],[5,"Room BC2 Swing",1,3850,175,36,68,850],[6,"Room BC3",1,3850,175,36,68,850],[7,"AV Control",3,200,0,40,70,1000],[8,"Lecturer Prep",4,150,0,30,55,575]]],["2.0","Small Group & PBL","#FFE885",[[9,"PBL Rooms",30,250,12,43,64,675],[10,"Seminar Rooms",6,550,24,44,70,625],[11,"Flexible Classroom",3,1800,60,30,80,675]]],["3.0","Digital Anatomy & Labs","#9EDDD1",[[12,"Digital Anatomy Lab",1,3500,82,50,70,975],[13,"Histology + Science",1,3600,40,44,64,800],[14,"Anatomy Studio",1,1500,0,35,55,700]]],["4.0","Clinical Skills & Sim","#EFB1D0",[[15,"Skills Labs",4,1600,24,44,80,875],[16,"Sim Suites",4,400,1,30,60,1150],[17,"Sim Control",4,150,0,30,60,1100],[18,"Debrief Rooms",12,300,12,26,46,650],[19,"SP Exam Rooms",30,120,1,16,80,900],[20,"SP Control",1,1500,0,16,80,950],[21,"SP Lounge",1,700,0,20,40,550],[22,"Sim Storage",1,2000,0,10,20,450]]],["5.0","Community","#CAEADF",[[23,"Data/Viz Studio",1,1200,0,25,50,750]]],["6.0","Student Learning","#FFE885",[[24,"Student Commons",1,7300,0,79,93,550],[25,"Quiet Study",1,11000,0,71,89,500],[26,"Lockers/Wellness",1,3580,0,60,85,400],[27,"Student Org Suite",1,600,0,30,55,500],[28,"Testing Lab",1,2800,80,36,90,700]]],["7.0","Faculty Offices","#B6CDEF",[[29,"Private Offices",70,120,1,45,65,600],[30,"Chair Offices",8,180,1,40,60,650],[31,"Open Workstations",12,64,1,35,55,550],[32,"Conf Room (12)",4,400,12,40,65,625],[33,"Conf Room (20)",1,600,20,40,65,625],[34,"Faculty Lounge",1,950,0,30,50,500],[35,"Mail/Copy",2,300,0,25,40,400]]],["8.0","Administration","#B6CDEF",[[36,"Dean's Suite",1,1100,0,45,60,650],[37,"Med Ed Office",1,900,0,45,60,600],[38,"Student Affairs",1,700,0,40,55,600],[39,"Registrar",1,400,0,35,50,550],[40,"Admin Workstations",8,64,1,40,60,500],[41,"Meeting Rooms",3,120,4,25,45,500],[42,"Board Room",1,650,20,20,50,750]]],["9.0","IT & AV","#C2C3C8",[[43,"Server/MDF",1,700,0,95,95,950],[44,"IDF Closets",5,100,0,95,95,600],[45,"AV Studio",1,800,0,30,55,900],[46,"IT Help Desk",1,500,0,40,60,600],[47,"IT Offices",5,120,1,40,60,550]]],["10.0","Building Support","#C2C3C8",[[48,"Entry/Reception",1,500,0,70,90,600],[49,"Restrooms",1,3800,0,50,80,550],[50,"MEP Rooms",1,4500,0,95,95,400],[51,"Security",1,400,0,40,60,400],[52,"Custodial",7,80,0,30,50,350],[53,"Loading/Receiving",1,1000,0,20,40,350],[54,"Storage",6,500,0,20,40,350],[55,"Lactation",2,100,0,15,30,400],[56,"First Aid",1,200,0,10,30,500]]]],"clinic":[["C1","Exam & Consultation","#96EBF6",[[1,"General Exam",14,120,1,45,75,750],[2,"Consultation",1,150,2,35,60,700],[3,"Triage Bays",2,80,1,50,80,600]]],["C2","Diagnostics","#B6CDEF",[[4,"POC Lab",1,300,0,40,65,850],[5,"Basic Imaging",1,400,0,30,55,950],[6,"Specimen Collection",1,120,1,35,60,700],[7,"Pharmacy",1,270,0,40,60,800]]],["C3","Urgent Care","#52D1ED",[[8,"UC Entry/Triage",1,200,0,50,80,650],[9,"Exam Bays",4,120,1,40,70,750],[10,"Procedure Bay",1,250,1,30,55,850]]],["C4","Patient Support","#FFF4C7",[[11,"Indoor Waiting",1,600,0,70,90,550],[12,"Outdoor Waiting",1,400,0,60,85,350],[13,"Health Ed Alcove",1,200,0,25,45,500],[14,"Patient WC",1,270,0,50,80,550]]],["C5","Med Education","#9EDDD1",[[15,"Student Workroom",1,350,8,43,65,600],[16,"Preceptor Offices",2,120,1,40,60,600],[17,"Student Lockers",1,110,0,60,85,400]]],["C6","Staff & Ops","#98ACE5",[[18,"Provider Offices",3,120,1,45,65,600],[19,"Clinic Manager",1,120,1,40,60,600],[20,"Staff Break",1,200,0,55,75,450]]],["C7","Building Support","#C2C3C8",[[21,"IT Closet",1,80,0,95,95,800],[22,"Custodial",1,80,0,30,50,350],[23,"Storage/Supply",1,200,0,25,40,350],[24,"Staff WC",1,170,0,50,80,550]]]],"residence":[["R1","Single Rooms","#FFCDAE",[[1,"Single Student",70,220,1,85,95,480]]],["R2","Double Rooms","#FFAF7D",[[2,"Double Student",40,340,2,85,95,450]]],["R3","Amenities","#F28D79",[[3,"Rooftop/Pool",1,3500,0,40,70,350],[4,"Kitchen/Dining",1,2500,0,65,85,550],[5,"Fitness",1,2800,0,50,80,500],[6,"Multi-Purpose",1,2400,0,30,60,450],[7,"Group Study",6,280,6,55,80,500],[8,"Quiet Lounge",1,440,0,65,85,450]]],["R4","Floor Common","#FFE885",[[9,"Floor Lounge",6,500,0,55,75,400],[10,"Floor Study",6,250,4,50,75,450],[11,"Laundry",3,200,0,40,60,350]]],["R5","Admin & Ops","#FF6A4F",[[12,"RA Apartments",2,350,1,90,95,450],[13,"Mgmt Office",1,200,1,40,60,550],[14,"Reception/Mail",1,200,0,50,70,500]]],["R6","Building Support","#C2C3C8",[[15,"Lobby",1,600,0,70,90,550],[16,"MEP/Gen/Cistern",1,1200,0,95,95,380],[17,"Storage/Maint",1,600,0,25,40,350],[18,"Trash/Recycle",1,250,0,20,35,300],[19,"Common WC",1,260,0,50,80,500]]]],"townhomes":[["T1","1-BR Units","#CAEADF",[[1,"1-BR Townhome",54,750,1,90,95,360]]],["T2","2-BR Units","#9EDDD1",[[2,"2-BR Townhome",16,1000,2,90,95,340]]],["T3","4-BR Units","#66C6C1",[[3,"4-BR Townhome",16,1250,4,90,95,320]]],["T4","Community","#FFE885",[[4,"Pool/Clubhouse",1,2500,0,40,65,400],[5,"Playground",1,1500,0,30,55,300],[6,"BBQ/Social",1,1200,0,25,50,250]]],["T5","Site Infra","#C2C3C8",[[7,"Roads/Parking",1,12000,0,0,0,180],[8,"Utilities",1,4000,0,0,0,250],[9,"Landscaping",1,6600,0,0,0,120]]]]}}];
+
+var F=function(n){return Math.round(n).toLocaleString()};
+var si=0,tab="academic",expanded={},aScale=3,sel=null,selR=null; // sel=building, selR=room key e.g. "academic-2-3"
+function S(){return SCENARIOS[si]}
+function R(bk){return S().rooms[bk]}
+function G(bk){return BMETA[bk].grossing}
+
+function catN(c){var t=0;for(var i=0;i<c[3].length;i++){var r=c[3][i];t+=r[2]*r[3]}return t}
+function bN(bk){var t=0,rs=R(bk);for(var i=0;i<rs.length;i++)t+=catN(rs[i]);return t}
+function bG(bk){var g=G(bk);return g===1?bN(bk):Math.round(bN(bk)*g)}
+function cGSF(){return bG("academic")+bG("clinic")+bG("residence")+bG("townhomes")}
+
+// Initialize enrollment data on each scenario
+for(var i=0;i<SCENARIOS.length;i++){
+  SCENARIOS[i].enr={total:2500,preclinical:1300,sept:325,jan:195,may:130,beds:150,facUnits:86};
+}
+function bCost(bk,tier){
+  var rs=R(bk),wN=0,wD=0;
+  for(var ci=0;ci<rs.length;ci++){var cat=rs[ci];for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri],g=Math.round(r[2]*r[3]*(G(bk)===1?1:G(bk)));wN+=g*r[7];wD+=g}}
+  var mid=wD>0?wN/wD:0;var mul=tier==="low"?.85:tier==="high"?1.15:1;return bG(bk)*Math.round(mid*mul);
+}
+
+function render(){
+  try{
+  var sh="";for(var i=0;i<SCENARIOS.length;i++)sh+='<button class="sb'+(i===si?' on':'')+'" onclick="si='+i+';render()">'+SCENARIOS[i].label+'</button>';
+  document.getElementById("st").innerHTML=sh;
+
+  var tds=[{id:"enrollment",l:"Enrollment"},{id:"academic",l:"Academic"},{id:"clinic",l:"Clinic"},{id:"residence",l:"Residence"},{id:"townhomes",l:"Townhomes"},{id:"space",l:"Space & Util"},{id:"cost",l:"Cost & Space"}];
+  var th="";for(var i=0;i<tds.length;i++){var t=tds[i];th+='<button class="tab'+(t.id===tab?' on':'')+'" onclick="tab=\''+t.id+'\';render()">'+t.l+'</button>'}
+  document.getElementById("tabs").innerHTML=th;
+
+  var e=S().enr;
+  var md=[[F(e.preclinical),"Preclinical"],[e.sept+"/"+e.jan+"/"+e.may,"Sept/Jan/May"],[F(bG("academic")),"Academic"],[F(bG("clinic")),"Clinic"],[F(bG("residence")),"Residence"],[F(bG("townhomes")),"Townhomes"],[F(cGSF()),"Campus GSF"]];
+  var mh="";for(var i=0;i<md.length;i++)mh+='<div class="m"><div class="mv">'+md[i][0]+'</div><div class="ml">'+md[i][1]+'</div></div>';
+  document.getElementById("ms").innerHTML=mh;
+
+  var ct=document.getElementById("ct");
+  if(tab==="enrollment")rEnr(ct);else if(tab==="space")rSpace(ct);else if(tab==="cost")rCost(ct);else rProg(ct,tab);
+  document.getElementById("ft").textContent="RUSM "+SCENARIOS[si].label+" \u00b7 "+F(cGSF())+" GSF";
+  }catch(e){console.error("render:",e)}
+}
+
+// ═══ ENROLLMENT TAB ═══
+function rEnr(ct){
+  var e=S().enr;
+  var items=[
+    {k:"total",l:"Total Enrollment",u:"",c:"var(--navy)",mn:1500,mx:4000,st:100},
+    {k:"preclinical",l:"Preclinical in Barbados",u:"students",c:"var(--teal)",mn:600,mx:2000,st:50},
+    {k:"sept",l:"September Cohort (A)",u:"students",c:"var(--gold)",mn:100,mx:500,st:5},
+    {k:"jan",l:"January Cohort (B)",u:"students",c:"var(--gold)",mn:50,mx:350,st:5},
+    {k:"may",l:"May Cohort (C)",u:"students",c:"var(--gold)",mn:30,mx:250,st:5},
+    {k:"beds",l:"Student Beds",u:"beds",c:"var(--coral)",mn:50,mx:400,st:10},
+    {k:"facUnits",l:"Faculty Housing Units",u:"units",c:"var(--teal)",mn:20,mx:150,st:2}
+  ];
+  var h='<div style="max-width:620px">';
+  h+='<table class="pt"><tr><th style="text-align:left">Parameter</th><th style="text-align:left">Value</th><th style="text-align:left">Range</th></tr>';
+  for(var i=0;i<items.length;i++){
+    var it=items[i],v=e[it.k];
+    h+='<tr><td style="font-family:\'DM Sans\',sans-serif;font-weight:500">'+it.l+'</td>';
+    h+='<td><input type="number" value="'+v+'" min="'+it.mn+'" max="'+it.mx+'" step="'+it.st+'" style="width:70px" onchange="eUpd(\''+it.k+'\',Number(this.value))"> <span style="font-size:.6rem;color:var(--mut)">'+it.u+'</span></td>';
+    h+='<td style="font-size:.6rem;color:var(--mut)">'+F(it.mn)+' \u2013 '+F(it.mx)+'</td></tr>';
+  }
+  h+='</table>';
+  // Summary
+  h+='<div style="background:var(--bg);border:1.5px solid var(--bdr);border-radius:var(--r);padding:10px;margin-top:8px">';
+  h+='<div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:4px">Enrollment Summary</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:.78rem">';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:1rem;font-weight:600;color:var(--navy)">'+F(e.preclinical)+'</div><div style="font-size:.6rem;color:var(--mut)">Preclinical</div></div>';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:1rem;font-weight:600;color:var(--navy)">'+Math.round(e.preclinical/2)+'</div><div style="font-size:.6rem;color:var(--mut)">Admitted/Year</div></div>';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:1rem;font-weight:600;color:var(--navy)">6</div><div style="font-size:.6rem;color:var(--mut)">Cohort Phases</div></div>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:.9rem;font-weight:600;color:var(--gold)">'+e.sept+'</div><div style="font-size:.6rem;color:var(--mut)">Sept Cohort</div></div>';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:.9rem;font-weight:600;color:var(--gold)">'+e.jan+'</div><div style="font-size:.6rem;color:var(--mut)">Jan Cohort</div></div>';
+  h+='<div style="text-align:center;background:#fff;padding:6px;border-radius:6px"><div style="font-family:\'DM Mono\',monospace;font-size:.9rem;font-weight:600;color:var(--gold)">'+e.may+'</div><div style="font-size:.6rem;color:var(--mut)">May Cohort</div></div>';
+  h+='</div>';
+  h+='<div style="font-size:.65rem;color:var(--mut);margin-top:6px">'+e.beds+' student beds \u00b7 '+e.facUnits+' faculty housing units \u00b7 '+(e.sept+e.jan+e.may)+'/yr intake</div>';
+  h+='</div></div>';
+  ct.innerHTML=h;
+}
+function eUpd(k,v){
+  var e=S().enr;e[k]=v;
+  if(k==="total"){e.preclinical=Math.round(v*.52);e.sept=Math.round(e.preclinical/2*.5);e.jan=Math.round(e.preclinical/2*.3);e.may=Math.round(e.preclinical/2*.2)}
+  if(k==="preclinical"){e.sept=Math.round(v/2*.5);e.jan=Math.round(v/2*.3);e.may=Math.round(v/2*.2)}
+  render();
+}
+
+// ═══ PROGRAM TAB ═══
+function rProg(ct,bk){
+  var rs=R(bk),g=G(bk),isG=(g===1),nsf=bN(bk),gsf=bG(bk),tgt=BMETA[bk].target;
+  var tNSF=isG?tgt:Math.round(tgt/g),mx=Math.round(tNSF/.75);if(nsf>mx*.95)mx=Math.round(nsf*1.1);
+  var bH=440,ntg=isG?"--":(100/g).toFixed(1)+"%",vr=gsf-tgt;
+  // Bar
+  var segs=[];for(var i=rs.length-1;i>=0;i--)segs.push(rs[i]);
+  var bh="";for(var i=0;i<segs.length;i++){var cat=segs[i],cn=catN(cat),px=Math.round(cn/mx*bH);
+    if(cn<=0)continue;var ek=bk+"-"+cat[0];var isE=expanded[ek]===true;
+    bh+='<div class="bs" style="height:'+px+'px;background:'+cat[2]+';cursor:pointer;outline:'+(isE?'2px solid var(--navy)':'none')+'" onclick="tgl(\''+ek+'\');return false">';
+    if(px>14)bh+='<span>'+cat[1]+'<br><small style="opacity:.7;font-size:.46rem;font-family:\'DM Mono\',monospace">'+F(cn)+'</small></span>';bh+='</div>'}
+  var tPx=Math.round(tNSF/mx*bH);
+  // Table — columns: expand, name, qty, NASF/unit, total, capacity, NASF/seat, typ%, pk%, driver, del
+  var th='<table class="pt"><tr><th style="width:14px"></th><th>Space / Room</th><th>Qty</th><th>'+BMETA[bk].unit+'/Unit</th><th>Total</th><th>Capacity</th><th>SF/Seat</th><th>Typ%</th><th>Pk%</th><th>Driver</th><th style="width:14px"></th></tr>';
+  for(var ci=0;ci<rs.length;ci++){
+    var cat=rs[ci],cn=catN(cat),ek=bk+"-"+cat[0],isE=expanded[ek]===true;
+    th+='<tr class="c" style="background:'+cat[2]+'" onclick="tgl(\''+ek+'\')">';
+    th+='<td><span class="ex '+(isE?'ex-d':'ex-r')+'"></span></td>';
+    th+='<td>'+cat[0]+' '+cat[1]+'</td><td></td><td></td><td style="font-family:\'DM Mono\',monospace">'+F(cn)+'</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+    for(var ri=0;ri<cat[3].length;ri++){
+      var r=cat[3][ri],rn=r[2]*r[3];
+      var drv="";if(r[4]>0){var capLabel=r[4]===1?"single occ":r[4]===2?"double occ":r[4]+" seats";drv=capLabel}if(r[2]>1&&r[3]>0)drv=(drv?drv+" \u00b7 ":"")+r[2]+"\u00d7"+F(r[3]);if(r[5]>0)drv=(drv?drv+" \u00b7 ":"")+"Typ "+r[5]+"%";
+      var sfSeat=(r[4]>2&&r[3]>0)?Math.round(r[3]/r[4]):0;
+      var rKey=bk+"-"+ci+"-"+ri;var isSelR=(selR===rKey);
+      th+='<tr class="r'+(isE?'':' h')+'" style="'+(isSelR?"background:var(--lTeal);outline:1px solid var(--navy)":"")+'">';
+      th+='<td></td><td style="padding-left:18px;cursor:pointer" onclick="pickRoom(\''+rKey+'\')">'+r[1]+'</td>';
+      th+='<td><input type="number" value="'+r[2]+'" min="0" max="200" onchange="uR(\''+bk+'\','+ci+','+ri+',2,this.value)"></td>';
+      th+='<td><input type="number" value="'+r[3]+'" min="0" max="20000" step="10" onchange="uR(\''+bk+'\','+ci+','+ri+',3,this.value)"></td>';
+      th+='<td style="font-family:\'DM Mono\',monospace">'+(rn>0?F(rn):"\u2014")+'</td>';
+      th+='<td><input type="number" value="'+r[4]+'" min="0" max="500" onchange="uR(\''+bk+'\','+ci+','+ri+',4,this.value)"></td>';
+      th+='<td style="font-family:\'DM Mono\',monospace;color:var(--blue)">'+(sfSeat>0?sfSeat:"\u2014")+'</td>';
+      th+='<td style="color:'+(r[5]>=50?"var(--teal)":r[5]>=35?"var(--gold)":"var(--coral)")+'">'+(r[5]>0?r[5]+"%":"\u2014")+'</td>';
+      th+='<td style="color:'+(r[6]>=80?"var(--coral)":r[6]>=60?"var(--gold)":"var(--teal)")+'">'+(r[6]>0?r[6]+"%":"\u2014")+'</td>';
+      th+='<td style="font-size:.55rem;color:var(--mut)">'+drv+'</td>';
+      th+='<td><button class="d" onclick="dR(\''+bk+'\','+ci+','+ri+')">\u2715</button></td></tr>';
+    }
+  }
+  th+='<tr class="t"><td></td><td>TOTAL '+BMETA[bk].unit+'</td><td></td><td></td><td>'+F(nsf)+'</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+  if(!isG)th+='<tr class="t"><td></td><td>GSF (\u00d7'+g+')</td><td></td><td></td><td>'+F(gsf)+'</td><td></td><td></td><td></td><td></td><td>N:G '+ntg+'</td><td></td></tr>';
+  th+='</table>';
+  th+='<div class="af"><select id="ac">';for(var ci=0;ci<rs.length;ci++)th+='<option value="'+ci+'">'+rs[ci][0]+' '+rs[ci][1]+'</option>';
+  th+='</select><input id="an" placeholder="Name" style="width:100px"><input id="aq" type="number" value="1" style="width:34px"><input id="af2" type="number" value="200" style="width:48px"><input id="as" type="number" value="0" style="width:34px" placeholder="Cap">';
+  th+='<button class="b bo" style="font-size:.6rem" onclick="aR(\''+bk+'\')">+ Add</button></div>';
+
+  var h='<div class="ly"><div class="bw"><div class="blb">'+(isG?"GSF":"NASF")+' vs Target</div>';
+  h+='<div class="bbx"><div class="bsk">'+bh+'</div><div class="btg" style="bottom:'+tPx+'px"><div class="btl">'+F(tgt)+' GSF</div></div></div>';
+  h+='<div class="bsub">'+F(nsf)+' '+(isG?"GSF":"NASF")+'</div>';
+  if(!isG)h+='<div class="bgsf">'+F(gsf)+' GSF</div><div class="bntg">N:G '+ntg+'</div>';
+  h+='<div class="bsub" style="margin-top:3px;color:'+(vr>0?"var(--coral)":"var(--teal)")+';font-weight:600">'+(vr>0?"+":"")+F(vr)+' GSF</div>';
+  h+='</div>'+th+'</div>';
+  ct.innerHTML=h;
+}
+
+// ═══ SPACE & UTIL ═══
+function rSpace(ct){
+  var bks=["academic","clinic","residence","townhomes"],cs=["#2E75B6","#52D1ED","#F28D79","#66C6C1"];
+  var h='<div class="sc"><span>Scale:</span><select onchange="aScale=Number(this.value);render()">';
+  var scs=[[1.5,'1/32\\"=1\\\''], [3,'1/16\\"=1\\\''], [6,'1/8\\"=1\\\''], [12,'1/4\\"=1\\\'']];
+  for(var i=0;i<scs.length;i++)h+='<option value="'+scs[i][0]+'"'+(aScale===scs[i][0]?' selected':'')+'>'+scs[i][1]+'</option>';
+  h+='</select></div>';
+
+  // Campus treemap — clickable buildings
+  var tot=cGSF(),W=960,H=90;
+  h+='<div class="cx" style="margin-bottom:8px"><div class="ct">Campus Program \u2014 '+F(tot)+' GSF <span style="font-size:.6rem;font-weight:400;color:var(--mut)">Click to select</span></div>';
+  h+='<svg width="'+W+'" height="'+H+'" style="display:block;border-radius:6px;overflow:hidden;cursor:pointer">';
+  var cx=0;
+  for(var i=0;i<bks.length;i++){var gsf=bG(bks[i]),w=(gsf/tot)*W,isSel=(sel===bks[i]);
+    h+='<rect x="'+(cx+1)+'" y="0" width="'+(w-2)+'" height="'+H+'" fill="'+(isSel?"#1B3A5C":cs[i])+'" rx="3" opacity=".9" onclick="pickBldg(\''+bks[i]+'\')" style="cursor:pointer"/>';
+    var tc=isSel?"#fff":"#fff";
+    if(w>55){h+='<text x="'+(cx+w/2)+'" y="'+(H*.3)+'" font-size="9" font-weight="700" text-anchor="middle" fill="'+tc+'" pointer-events="none">'+BMETA[bks[i]].label+'</text>';
+      h+='<text x="'+(cx+w/2)+'" y="'+(H*.55)+'" font-size="12" font-weight="600" font-family="DM Mono,monospace" text-anchor="middle" fill="'+tc+'" pointer-events="none">'+F(gsf)+'</text>';
+      h+='<text x="'+(cx+w/2)+'" y="'+(H*.75)+'" font-size="9" text-anchor="middle" fill="rgba(255,255,255,.7)" pointer-events="none">'+(gsf/tot*100).toFixed(1)+'%</text>'}
+    cx+=w}
+  h+='</svg></div>';
+
+  // Detail card for selected building
+  if(sel&&BMETA[sel]){
+    var bd=BMETA[sel],nsf=bN(sel),gsf2=bG(sel),g=bd.grossing,ntg2=g===1?"--":(100/g).toFixed(1)+"%";
+    h+='<div class="cx" style="margin-bottom:8px;border-left:4px solid '+(cs[bks.indexOf(sel)]||"var(--navy)")+'">';
+    h+='<div class="ct">'+bd.label+' \u2014 Detail</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:.75rem">';
+    h+='<div><span style="color:var(--mut)">NASF</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+F(nsf)+'</b></div>';
+    h+='<div><span style="color:var(--mut)">GSF</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+F(gsf2)+'</b></div>';
+    h+='<div><span style="color:var(--mut)">N:G</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+ntg2+'</b></div>';
+    h+='<div><span style="color:var(--mut)">Target</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+F(bd.target)+'</b></div>';
+    h+='</div>';
+    // Category breakdown for selected building
+    var rs=R(sel);
+    h+='<div style="margin-top:8px">';
+    for(var ci=0;ci<rs.length;ci++){var cat=rs[ci],cn=catN(cat);if(cn<=0)continue;
+      var pct=(cn/nsf*100).toFixed(1);
+      h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;cursor:pointer" onclick="tgl(\''+sel+'-'+cat[0]+'\');render()">';
+      h+='<span style="width:8px;height:8px;border-radius:2px;background:'+cat[2]+';flex-shrink:0"></span>';
+      h+='<span style="flex:1;font-size:.7rem">'+cat[0]+' '+cat[1]+'</span>';
+      h+='<span style="font-family:\'DM Mono\',monospace;font-size:.68rem;color:var(--navy)">'+F(cn)+'</span>';
+      h+='<div style="width:80px;height:8px;background:#eee;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+cat[2]+';border-radius:3px"></div></div>';
+      h+='<span style="font-size:.6rem;color:var(--mut);width:32px;text-align:right">'+pct+'%</span>';
+      h+='</div>';
+      // Show rooms if expanded
+      if(expanded[sel+"-"+cat[0]]){
+        for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri];if(r[2]===0)continue;
+          h+='<div style="display:flex;gap:4px;margin-left:14px;margin-bottom:1px;font-size:.62rem;color:#555">';
+          h+='<span style="flex:1">'+r[1]+'</span>';
+          h+='<span style="font-family:\'DM Mono\',monospace;width:50px;text-align:right">'+F(r[2]*r[3])+'</span>';
+          h+='<span style="font-family:\'DM Mono\',monospace;width:35px;text-align:right;color:'+(r[5]>=50?"var(--teal)":r[5]>=35?"var(--gold)":"var(--coral)")+'">'+(r[5]>0?r[5]+"%":"\u2014")+'</span>';
+          h+='</div>'}
+      }
+    }
+    h+='</div></div>';
+  }
+
+  // Two-column: utilization + room plan
+  h+='<div class="g2">';
+  h+='<div class="cx"><div class="ct">Utilization \u2014 '+(sel?BMETA[sel].label:"Academic")+'</div>'+utSVG(sel||"academic")+'<div class="cs">50-hr week. Solid=typical, light=peak.</div></div>';
+  h+='<div class="cx"><div class="ct">Proportions \u2014 '+(sel?BMETA[sel].label:"Academic")+'</div>'+ppSVG(sel||"academic")+'</div>';
+  h+='</div>';
+
+  // Room detail card when a room is selected
+  if(selR){
+    var parts=selR.split("-");var rbk=parts[0],rci=Number(parts[1]),rri=Number(parts[2]);
+    var rBld=R(rbk);if(rBld&&rBld[rci]&&rBld[rci][3][rri]){
+      var rr=rBld[rci][3][rri],rcat=rBld[rci],rNasf=rr[2]*rr[3],rGsf=Math.round(rNasf*(G(rbk)===1?1:G(rbk)));
+      var sfSeat2=(rr[4]>2)?Math.round(rr[3]/rr[4]):0;
+      var rDim=Math.sqrt(rr[3]/12);
+      h+='<div class="cx" style="margin-top:8px;border-left:4px solid '+rcat[2]+';display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px">';
+      h+='<div><div style="font-size:.85rem;font-weight:700;color:var(--navy)">'+rr[1]+'</div><div style="font-size:.62rem;color:var(--mut)">'+rcat[0]+' '+rcat[1]+'</div></div>';
+      h+='<div><span style="font-size:.6rem;color:var(--mut)">NASF</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+F(rNasf)+'</b></div>';
+      h+='<div><span style="font-size:.6rem;color:var(--mut)">Capacity</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">'+(rr[4]>0?rr[4]+(rr[4]===1?" occ":" seats"):"\u2014")+'</b>'+(sfSeat2>0?'<br><span style="font-size:.58rem;color:var(--blue)">'+sfSeat2+' SF/seat</span>':'')+'</div>';
+      h+='<div><span style="font-size:.6rem;color:var(--mut)">Utilization</span><br><b style="font-family:\'DM Mono\',monospace;color:'+(rr[5]>=50?"var(--teal)":rr[5]>=35?"var(--gold)":"var(--coral)")+'">'+(rr[5]>0?rr[5]+"% typ":"\u2014")+'</b><br><span style="font-size:.58rem;color:var(--mut)">'+(rr[6]>0?rr[6]+"% peak":"")+'</span></div>';
+      h+='<div><span style="font-size:.6rem;color:var(--mut)">$/GSF \u00b7 Cost</span><br><b style="font-family:\'DM Mono\',monospace;color:var(--navy)">$'+rr[7]+'</b><br><span style="font-size:.58rem;color:var(--mut)">$'+F(Math.round(rGsf*rr[7]/1000))+'K</span></div>';
+      h+='</div>';
+    }
+  }
+
+  // Room plan
+  h+='<div class="cx" style="margin-top:8px"><div class="ct">Room Plan \u2014 '+(sel?BMETA[sel].label:"Academic")+' <span style="font-size:.6rem;font-weight:400;color:var(--mut)">Click a room for detail</span></div><div class="pb">'+rpSVG(sel||"academic")+'</div></div>';
+  ct.innerHTML=h;
+}
+
+// ═══ COST & SPACE ═══
+function rCost(ct){
+  var ef=Math.pow(1.04,3.5),bks=["academic","clinic","residence","townhomes"],cols=["#2E75B6","#52D1ED","#F28D79","#66C6C1"];
+
+  // Clickable building selector bar
+  var tot=cGSF(),W=960,H=60;
+  var h='<svg width="'+W+'" height="'+H+'" style="display:block;border-radius:6px;overflow:hidden;cursor:pointer;margin-bottom:8px">';
+  var cx2=0;
+  for(var i=0;i<bks.length;i++){var gsf=bG(bks[i]),w=(gsf/tot)*W,isSel2=(sel===bks[i]);
+    h+='<rect x="'+(cx2+1)+'" y="0" width="'+(w-2)+'" height="'+H+'" fill="'+(isSel2?"#1B3A5C":cols[i])+'" rx="3" opacity=".9" onclick="pickBldg(\''+bks[i]+'\')" style="cursor:pointer"/>';
+    if(w>50){h+='<text x="'+(cx2+w/2)+'" y="'+(H*.4)+'" font-size="8" font-weight="700" text-anchor="middle" fill="#fff" pointer-events="none">'+BMETA[bks[i]].label+'</text>';
+      h+='<text x="'+(cx2+w/2)+'" y="'+(H*.7)+'" font-size="10" font-weight="600" font-family="DM Mono,monospace" text-anchor="middle" fill="#fff" pointer-events="none">$'+F(Math.round(bCost(bks[i],"mid")/1e6))+'M</text>'}
+    cx2+=w}h+='</svg>';
+
+  // Cost table
+  h+='<table class="kt"><tr><th>Building</th><th>GSF</th><th>$/GSF</th><th>Low</th><th>Mid</th><th>High</th></tr>';
+  var tL=0,tM=0,tH=0;
+  for(var i=0;i<bks.length;i++){var bk=bks[i],gsf3=bG(bk),lo=bCost(bk,"low"),mi=bCost(bk,"mid"),hi=bCost(bk,"high");
+    var rate=gsf3>0?Math.round(mi/gsf3):0;tL+=lo;tM+=mi;tH+=hi;
+    var isHL=(sel===bk);
+    h+='<tr style="'+(isHL?"background:#1B3A5C10;font-weight:700":"")+'cursor:pointer" onclick="pickBldg(\''+bk+'\')">';
+    h+='<td><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+cols[i]+';margin-right:4px"></span>'+BMETA[bk].label+'</td><td>'+F(gsf3)+'</td><td>$'+F(rate)+'</td>';
+    h+='<td>$'+F(Math.round(lo/1e6))+'M</td><td>$'+F(Math.round(mi/1e6))+'M</td><td>$'+F(Math.round(hi/1e6))+'M</td></tr>'}
+  h+='<tr class="a"><td>Construction</td><td>'+F(cGSF())+'</td><td></td><td>$'+F(Math.round(tL/1e6))+'M</td><td>$'+F(Math.round(tM/1e6))+'M</td><td>$'+F(Math.round(tH/1e6))+'M</td></tr>';
+  h+='<tr><td>Escalated (\u00d7'+ef.toFixed(3)+')</td><td colspan="2" style="text-align:left;font-size:.58rem;color:var(--mut)">4%/yr \u2192 2028.5</td>';
+  h+='<td>$'+F(Math.round(tL*ef/1e6))+'M</td><td>$'+F(Math.round(tM*ef/1e6))+'M</td><td>$'+F(Math.round(tH*ef/1e6))+'M</td></tr>';
+  h+='<tr class="a"><td>Project (\u00d71.30)</td><td colspan="2"></td>';
+  h+='<td>$'+F(Math.round(tL*ef*1.3/1e6))+'M</td><td>$'+F(Math.round(tM*ef*1.3/1e6))+'M</td><td>$'+F(Math.round(tH*ef*1.3/1e6))+'M</td></tr>';
+  h+='</table>';
+
+  // Detail card for selected building cost breakdown
+  if(sel&&BMETA[sel]){
+    var bd=BMETA[sel],rs=R(sel),gsf4=bG(sel),ci2=bks.indexOf(sel);
+    h+='<div class="cx" style="margin-top:8px;border-left:4px solid '+cols[ci2]+'">';
+    h+='<div class="ct">'+bd.label+' \u2014 Cost by Category</div>';
+    var maxCat=0;
+    for(var ci=0;ci<rs.length;ci++){var cat=rs[ci],cn=catN(cat);var cg=Math.round(cn*(G(sel)===1?1:G(sel)));if(cg>maxCat)maxCat=cg}
+    for(var ci=0;ci<rs.length;ci++){var cat=rs[ci],cn=catN(cat);if(cn<=0)continue;
+      var cg=Math.round(cn*(G(sel)===1?1:G(sel)));
+      // Weighted cost for this category
+      var wN=0,wD=0;for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri],rg=Math.round(r[2]*r[3]*(G(sel)===1?1:G(sel)));wN+=rg*r[7];wD+=rg}
+      var mid2=wD>0?Math.round(wN/wD):0;var catCost=cg*mid2;
+      h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">';
+      h+='<span style="width:8px;height:8px;border-radius:2px;background:'+cat[2]+';flex-shrink:0"></span>';
+      h+='<span style="width:120px;font-size:.7rem">'+cat[1]+'</span>';
+      h+='<div style="flex:1;height:14px;background:#eee;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(cg/maxCat*100)+'%;background:'+cat[2]+';opacity:.7;border-radius:3px"></div></div>';
+      h+='<span style="font-family:\'DM Mono\',monospace;font-size:.65rem;width:55px;text-align:right;color:var(--navy)">'+F(cg)+' GSF</span>';
+      h+='<span style="font-family:\'DM Mono\',monospace;font-size:.65rem;width:50px;text-align:right;color:var(--mut)">$'+mid2+'</span>';
+      h+='<span style="font-family:\'DM Mono\',monospace;font-size:.65rem;width:55px;text-align:right;color:var(--navy)">$'+F(Math.round(catCost/1000))+'K</span>';
+      h+='</div>'}
+    h+='</div>';
+  }
+
+  // Charts
+  h+='<div class="g2">';
+  h+='<div class="cx"><div class="ct">Cost Range</div>'+cbSVG()+'</div>';
+  h+='<div class="cx"><div class="ct">$/GSF Comparison</div>'+rbSVG()+'</div></div>';
+  h+='<div class="cx" style="margin-top:8px"><div class="ct">Campus GSF</div>'+wfSVG()+'</div>';
+  ct.innerHTML=h;
+}
+
+// ═══ SVG ═══
+function tmSVG(){var W=960,H=110,bks=["academic","clinic","residence","townhomes"],cs=["#2E75B6","#52D1ED","#F28D79","#66C6C1"],tot=cGSF(),s='<svg width="'+W+'" height="'+H+'" style="display:block;border-radius:6px;overflow:hidden">',cx=0;
+  for(var i=0;i<bks.length;i++){var gsf=bG(bks[i]),w=(gsf/tot)*W;
+    s+='<rect x="'+(cx+1)+'" y="0" width="'+(w-2)+'" height="'+H+'" fill="'+cs[i]+'" rx="3" opacity=".85"/>';
+    if(w>55){s+='<text x="'+(cx+w/2)+'" y="'+(H*.3)+'" font-size="9" font-weight="700" text-anchor="middle" fill="#fff">'+BMETA[bks[i]].label+'</text>';
+      s+='<text x="'+(cx+w/2)+'" y="'+(H*.55)+'" font-size="12" font-weight="600" font-family="DM Mono,monospace" text-anchor="middle" fill="#fff">'+F(gsf)+'</text>';
+      s+='<text x="'+(cx+w/2)+'" y="'+(H*.75)+'" font-size="9" text-anchor="middle" fill="rgba(255,255,255,.8)">'+(gsf/tot*100).toFixed(1)+'%</text>'}
+    cx+=w}s+='</svg>';return s}
+
+function rpSVG(bk){var rs=R(bk),Sc=aScale,G2=Math.max(Sc*.4,2),CG=Sc*1.5,LH=14,MW=960,s='',cy=3;
+  for(var ci=0;ci<rs.length;ci++){var cat=rs[ci],cn=catN(cat);if(cn<=0)continue;
+    var ek=bk+"-"+cat[0];
+    s+='<rect x="2" y="'+cy+'" width="'+(MW-4)+'" height="'+LH+'" fill="'+cat[2]+'" opacity=".3" rx="2" style="cursor:pointer" onclick="tgl(\''+ek+'\')"/>';
+    s+='<text x="5" y="'+(cy+10)+'" font-size="9" font-weight="700" fill="#404040" pointer-events="none">'+cat[0]+' '+cat[1]+' \u2014 '+F(cn)+'</text>';
+    var x=2,ry=cy+LH+G2,rh=0;
+    for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri];if(r[2]===0||r[3]===0)continue;
+      for(var u=0;u<r[2];u++){var a=r[3],k=Math.sqrt(a/12),pw=Math.max(4*k*Sc/5,5),ph=Math.max(3*k*Sc/5,4);
+        if(x+pw>MW-2){x=2;ry+=rh+G2;rh=0}
+        var rKey=bk+"-"+ci+"-"+ri;var isSel3=(selR===rKey);
+        s+='<rect x="'+x+'" y="'+ry+'" width="'+pw+'" height="'+ph+'" fill="'+(isSel3?"#1B3A5C":cat[2])+'" stroke="'+(isSel3?"#FEB522":"rgba(0,0,0,.1)")+'" stroke-width="'+(isSel3?"2":".5")+'" rx="1" style="cursor:pointer" onclick="pickRoom(\''+rKey+'\')"/>';
+        if(pw>18&&ph>8){var fs=Math.min(Math.max(pw*.22,4),9);s+='<text x="'+(x+pw/2)+'" y="'+(ry+ph/2+fs*.3)+'" font-size="'+fs+'" text-anchor="middle" fill="'+(isSel3?"#fff":"#404040")+'" font-weight="600" pointer-events="none">'+(r[2]>1?r[1].substring(0,3)+(u+1):r[1].substring(0,10))+'</text>'}
+        x+=pw+G2;rh=Math.max(rh,ph)}}
+    cy=ry+rh+CG}
+  return '<svg width="'+MW+'" height="'+(cy+3)+'" style="display:block">'+s+'</svg>'}
+
+function utSVG(bk){var rs=R(bk),items=[],seen={};
+  for(var ci=0;ci<rs.length;ci++){var cat=rs[ci];for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri];if(r[2]===0||r[5]===0)continue;
+    var k=r[1];if(!seen[k]){seen[k]=true;var rKey=bk+"-"+ci+"-"+ri;items.push({n:(r[2]>1?r[1]+"("+r[2]+")":r[1]).substring(0,20),t:r[5],p:r[6],cl:cat[2],rk:rKey})}}}
+  items.sort(function(a,b){return b.t-a.t});if(items.length>15)items=items.slice(0,15);
+  var W=460,rh=16,H=items.length*rh+4,s='<svg width="'+W+'" height="'+H+'" style="display:block">';
+  for(var i=0;i<items.length;i++){var u=items[i],y=i*rh;var isSel4=(selR===u.rk);
+    s+='<text x="105" y="'+(y+11)+'" font-size="8" text-anchor="end" fill="'+(isSel4?"#1B3A5C":"#404040")+'" font-weight="'+(isSel4?"700":"400")+'" style="cursor:pointer" onclick="pickRoom(\''+u.rk+'\')">'+u.n+'</text>';
+    s+='<rect x="108" y="'+y+'" width="'+(u.p*2.6)+'" height="'+(rh-2)+'" fill="'+u.cl+'" opacity=".25" rx="2" style="cursor:pointer" onclick="pickRoom(\''+u.rk+'\')"/>';
+    s+='<rect x="108" y="'+y+'" width="'+(u.t*2.6)+'" height="'+(rh-2)+'" fill="'+(isSel4?"#1B3A5C":u.cl)+'" opacity=".85" rx="2" style="cursor:pointer" onclick="pickRoom(\''+u.rk+'\')"/>';
+    s+='<text x="'+(111+u.t*2.6)+'" y="'+(y+10)+'" font-size="7" fill="#404040" font-family="DM Mono,monospace" pointer-events="none">'+u.t+'%</text>'}
+  s+='</svg>';return s}
+
+function ppSVG(bk){var rs=R(bk),tn=bN(bk),W=460,H=130,s='<svg width="'+W+'" height="'+H+'" style="display:block;border-radius:6px;overflow:hidden">',cx=0;
+  for(var ci=0;ci<rs.length;ci++){var cat=rs[ci],cn=catN(cat);if(cn<=0)continue;var w=(cn/tn)*W;var ek=bk+"-"+cat[0];var isE5=expanded[ek]===true;
+    s+='<rect x="'+(cx+.5)+'" y="0" width="'+(w-1)+'" height="'+H+'" fill="'+(isE5?"#1B3A5C":cat[2])+'" rx="2" opacity=".85" style="cursor:pointer" onclick="tgl(\''+ek+'\')"/>';
+    var fc=isE5?"#fff":"#1B3A5C";
+    if(w>38){s+='<text x="'+(cx+w/2)+'" y="'+(H*.32)+'" font-size="'+(w>70?8:6)+'" font-weight="700" text-anchor="middle" fill="'+fc+'" pointer-events="none">'+cat[1]+'</text>';
+      s+='<text x="'+(cx+w/2)+'" y="'+(H*.52)+'" font-size="'+(w>50?10:7)+'" font-weight="600" font-family="DM Mono,monospace" text-anchor="middle" fill="'+fc+'" pointer-events="none">'+F(cn)+'</text>';
+      s+='<text x="'+(cx+w/2)+'" y="'+(H*.7)+'" font-size="8" font-weight="600" text-anchor="middle" fill="'+fc+'" pointer-events="none">'+(cn/tn*100).toFixed(1)+'%</text>'}
+    cx+=w}s+='</svg>';return s}
+
+function wfSVG(){var bks=["academic","clinic","residence","townhomes"],cs=["#2E75B6","#52D1ED","#F28D79","#66C6C1"],tot=cGSF();
+  var W=560,H=150,bW=70,gp=25,s='<svg width="'+W+'" height="'+H+'" style="display:block">',x=30;
+  for(var i=0;i<bks.length;i++){var v=bG(bks[i]),h2=v/tot*110;var isSel6=(sel===bks[i]);
+    s+='<rect x="'+x+'" y="'+(120-h2)+'" width="'+bW+'" height="'+h2+'" fill="'+(isSel6?"#1B3A5C":cs[i])+'" rx="3" opacity=".85" style="cursor:pointer" onclick="pickBldg(\''+bks[i]+'\')"/>';
+    s+='<text x="'+(x+bW/2)+'" y="'+(115-h2)+'" font-size="8" font-weight="600" text-anchor="middle" fill="'+(isSel6?"#1B3A5C":cs[i])+'" font-family="DM Mono,monospace" pointer-events="none">'+F(v)+'</text>';
+    s+='<text x="'+(x+bW/2)+'" y="138" font-size="7" text-anchor="middle" fill="#404040" pointer-events="none">'+BMETA[bks[i]].label.split(" ")[0]+'</text>';x+=bW+gp}
+  s+='<rect x="'+x+'" y="10" width="'+bW+'" height="110" fill="#1B3A5C" rx="3"/>';
+  s+='<text x="'+(x+bW/2)+'" y="5" font-size="9" font-weight="700" text-anchor="middle" fill="#1B3A5C" font-family="DM Mono,monospace">'+F(tot)+'</text>';
+  s+='<text x="'+(x+bW/2)+'" y="138" font-size="7" font-weight="700" text-anchor="middle" fill="#1B3A5C">Campus</text>';
+  s+='</svg>';return s}
+
+function cbSVG(){var bks=["academic","clinic","residence","townhomes"],cs=["#2E75B6","#52D1ED","#F28D79","#66C6C1"],mx=0;
+  for(var i=0;i<bks.length;i++){var hi=bCost(bks[i],"high");if(hi>mx)mx=hi}if(mx===0)mx=1;
+  var W=460,bh=26,H=bks.length*bh+6,s='<svg width="'+W+'" height="'+H+'" style="display:block">';
+  for(var i=0;i<bks.length;i++){var bk=bks[i],lo=bCost(bk,"low"),mi=bCost(bk,"mid"),hi=bCost(bk,"high"),y=i*bh;
+    var wH=(hi/mx*320),wM=(mi/mx*320),wL=(lo/mx*320);
+    s+='<text x="105" y="'+(y+16)+'" font-size="8" text-anchor="end" fill="#404040">'+BMETA[bk].label+'</text>';
+    s+='<rect x="108" y="'+y+'" width="'+wH+'" height="'+(bh-4)+'" fill="'+cs[i]+'" opacity=".2" rx="3"/>';
+    s+='<rect x="108" y="'+y+'" width="'+wM+'" height="'+(bh-4)+'" fill="'+cs[i]+'" opacity=".5" rx="3"/>';
+    s+='<rect x="108" y="'+y+'" width="'+wL+'" height="'+(bh-4)+'" fill="'+cs[i]+'" opacity=".85" rx="3"/>';
+    s+='<text x="'+(111+wH)+'" y="'+(y+14)+'" font-size="6" fill="#404040" font-family="DM Mono,monospace">$'+F(Math.round(lo/1e6))+'M\u2013$'+F(Math.round(hi/1e6))+'M</text>'}
+  s+='</svg>';return s}
+
+function rbSVG(){var bks=["academic","clinic","residence","townhomes"],cs=["#2E75B6","#52D1ED","#F28D79","#66C6C1"],mxR=0;
+  for(var i=0;i<bks.length;i++){var rs=R(bks[i]),wN=0,wD=0;
+    for(var ci=0;ci<rs.length;ci++){var cat=rs[ci];for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri],rg=Math.round(r[2]*r[3]*(G(bks[i])===1?1:G(bks[i])));wN+=rg*r[7];wD+=rg}}
+    var hi=Math.round((wD>0?wN/wD:0)*1.15);if(hi>mxR)mxR=hi}if(mxR===0)mxR=1;
+  var W=460,bh=28,H=bks.length*bh+6,s='<svg width="'+W+'" height="'+H+'" style="display:block">';
+  for(var i=0;i<bks.length;i++){var bk=bks[i],rs=R(bk),wN=0,wD=0;
+    for(var ci=0;ci<rs.length;ci++){var cat=rs[ci];for(var ri=0;ri<cat[3].length;ri++){var r=cat[3][ri],rg=Math.round(r[2]*r[3]*(G(bk)===1?1:G(bk)));wN+=rg*r[7];wD+=rg}}
+    var mid=wD>0?Math.round(wN/wD):0;if(mid===0)continue;var lo=Math.round(mid*.85),hi=Math.round(mid*1.15),y=i*bh;
+    var x1=(lo/mxR*320)+108,x2=(hi/mxR*320)+108,xm=(mid/mxR*320)+108;
+    s+='<text x="105" y="'+(y+17)+'" font-size="8" text-anchor="end" fill="#404040">'+BMETA[bk].label+'</text>';
+    s+='<rect x="'+x1+'" y="'+y+'" width="'+(x2-x1)+'" height="'+(bh-4)+'" fill="'+cs[i]+'" opacity=".3" rx="3"/>';
+    s+='<rect x="'+xm+'" y="'+y+'" width="3" height="'+(bh-4)+'" fill="'+cs[i]+'" rx="1"/>';
+    s+='<text x="'+(x1-2)+'" y="'+(y+15)+'" font-size="6" text-anchor="end" fill="#888" font-family="DM Mono,monospace">$'+lo+'</text>';
+    s+='<text x="'+(x2+3)+'" y="'+(y+15)+'" font-size="6" fill="#888" font-family="DM Mono,monospace">$'+hi+'</text>'}
+  s+='</svg>';return s}
+
+// ═══ INTERACTIONS ═══
+function tgl(k){expanded[k]=!expanded[k];render()}
+function pickBldg(bk){sel=(sel===bk)?null:bk;selR=null;render()}
+function pickRoom(rk){selR=(selR===rk)?null:rk;render()}
+function uR(bk,ci,ri,f,v){S().rooms[bk][ci][3][ri][f]=Number(v);render()}
+function dR(bk,ci,ri){S().rooms[bk][ci][3].splice(ri,1);render()}
+function aR(bk){var ci=Number(document.getElementById("ac").value),nm=document.getElementById("an").value||"New Room";
+  var q=Number(document.getElementById("aq").value)||1,nf=Number(document.getElementById("af2").value)||200,se=Number(document.getElementById("as").value)||0;
+  var n=0;var rs=R(bk);for(var c=0;c<rs.length;c++)n+=rs[c][3].length;
+  rs[ci][3].push([n+1,nm,q,nf,se,0,0,500]);expanded[bk+"-"+rs[ci][0]]=true;render()}
+
+function doSave(){
+  var p={exportDate:new Date().toISOString(),version:"dashboard-v8",scenarios:SCENARIOS,meta:BMETA,computed:{campus:cGSF()}};
+  var bl=new Blob([JSON.stringify(p,null,2)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="RUSM_Program_"+new Date().toISOString().slice(0,10)+".json";a.click();
+  var b=document.getElementById("sv");b.textContent="\u2713 Saved";b.style.background="#548235";
+  setTimeout(function(){b.textContent="Export JSON";b.style.background=""},3000)}
+
+render();
+</script></body></html>
